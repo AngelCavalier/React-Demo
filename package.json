@@ -3,13 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@babel/core": "7.9.0",
+    "@babel/core": "^7.9.0",
     "@svgr/webpack": "4.3.3",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "@typescript-eslint/eslint-plugin": "^2.10.0",
     "@typescript-eslint/parser": "^2.10.0",
+    "antd": "^4.5.2",
+    "axios": "^0.19.2",
     "babel-eslint": "10.1.0",
     "babel-jest": "^24.9.0",
     "babel-loader": "8.1.0",
@@ -31,12 +33,14 @@
     "file-loader": "4.3.0",
     "fs-extra": "^8.1.0",
     "html-webpack-plugin": "4.0.0-beta.11",
+    "http-proxy-middleware": "^1.0.5",
     "identity-obj-proxy": "3.0.0",
     "jest": "24.9.0",
     "jest-environment-jsdom-fourteen": "1.0.1",
     "jest-resolve": "24.9.0",
     "jest-watch-typeahead": "0.4.2",
     "mini-css-extract-plugin": "0.9.0",
+    "node-sass": "^4.14.1",
     "optimize-css-assets-webpack-plugin": "5.0.3",
     "pnp-webpack-plugin": "1.6.4",
     "postcss-flexbugs-fixes": "4.1.0",
@@ -48,9 +52,10 @@
     "react-app-polyfill": "^1.0.6",
     "react-dev-utils": "^10.2.1",
     "react-dom": "^16.13.1",
-    "resolve": "1.15.0",
+    "react-router-dom": "^5.2.0",
+    "resolve": "^1.15.0",
     "resolve-url-loader": "3.1.1",
-    "sass-loader": "8.0.2",
+    "sass-loader": "^8.0.2",
     "semver": "6.3.0",
     "style-loader": "0.23.1",
     "terser-webpack-plugin": "2.3.5",
@@ -135,5 +140,9 @@
     "presets": [
       "react-app"
     ]
+  },
+  "devDependencies": {
+    "babel-plugin-import": "^1.13.0",
+    "sass-resources-loader": "^2.0.3"
   }
 }
