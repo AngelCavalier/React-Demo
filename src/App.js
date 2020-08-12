@@ -1,21 +1,24 @@
-import React from 'react';
-import { Route, Switch, HashRouter } from 'react-router-dom';
+import React from "react";
+import { Route, Switch, BrowserRouter } from "react-router-dom";
 //引用组件
-import Login from './views/login/index';
+import Login from "./views/login/Index";
+import Index from "./views/index/Index";
+//私有组件方法
+import PrivateRouter from "./components/privateRouter/index"
 
 class App extends React.Component {
   constructor(props) {
-    super(props)
-    this.state = {}
+    super(props);
+    this.state = {};
   }
   render() {
     return (
-      <HashRouter>
+      <BrowserRouter>
         <Switch>
-          <Route path="/" component={Login} />
+          <Route exact component={Login} path="/" />
+          <PrivateRouter component={Index} path="/index" />
         </Switch>
-      </HashRouter>
-
+      </BrowserRouter>
     );
   }
 }

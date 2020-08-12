@@ -11,6 +11,20 @@ export function Login(data) {
         //params:data//请求类型为get时
     })
 }
+
+/**
+ * 注册接口
+ */
+
+export function Register(data) {
+    return service.request({
+        url: "/register/",
+        method: "post",
+        data: data,//请求类型为post时
+        //params:data//请求类型为get时
+    })
+}
+
 /**
 *获取验证码
 */

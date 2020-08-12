@@ -1,100 +1,84 @@
 import React, { Component, Fragment } from "react";
+import { withRouter } from "react-router-dom";
 //ANTD组件
-import { Form, Input, Button, Row, Col, message } from 'antd';
+import { Form, Input, Button, Row, Col } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 //验证
 import { validate_password } from "../../utils/validate"
 //API
-import { Login, GetCode } from "../../api/account"
+import { Login } from "../../api/account"
+//组件
+import Code from "../../components/code/index"
+//密码加密
+import CryptoJS from 'crypto-js'
+// 方法
+import { setToken } from "../../utils/sessions";
+
+
+
 class LoginForm extends Component {
     constructor(props) {
-        super()
+        super(props)
         this.state = {
             username: "",
-            code_button_loading: false,
-            code_button_text: "获取验证码",
-            code_button_disabled: false
+            password: "",
+            code: "",
+            module: "login",
+            loading: false
         };
-        //react没有数据双向绑定
     }
     //登录
     onFinish = (values) => {
-        Login().then(response => {
-            console.log(response)
+        const requestData = {
+            username: this.state.username,
+            password: CryptoJS.MD5(this.state.password).toString(),
+            code: this.state.code
+        }
+        this.setState({
+            loading: true
+        })
+        Login(requestData).then(response => {
+            this.setState({
+                loading: false
+            })
+            const data = response.data.data
+            //存储token
+            setToken(data.token);
+            //路由跳转
+            this.props.history.push('/index')
         }).catch(error => {
-            console.log(error)
+            this.setState({
+                loading: false
+            })
         })
         console.log('Received values of form: ', values);
     }
-    //获取验证码
-    getCode = () => {
-        if (!this.state.username) {
-            message.warning('用户名不能为空！', 1);
-            return false;
-        }
-        this.setState({
-            code_button_loading: true,
-            code_button_text: "发送中"
-        })
-        const requestData = {
-            username: this.state.username,
-            module: "login"
-        }
-        GetCode(requestData).then(response => {
-            //执行倒计时
-            this.countDown();
-        }).catch(error => {
-            this.setState({
-                code_button_loading: false,
-                code_button_text: "重新获取"
-            })
-        })
-    }
+
     //input输入处理
-    inputChange = (e) => {
+    inputChangeUsername = (e) => {
         let value = e.target.value;
         this.setState({
             username: value//获取输入框的username
         })
     }
-    //倒计时
-    countDown = () => {
-        //定时器
-        let timer = null;
-        //倒计时时间
-        let sec = 60;
-        //修改状态
+    inputChangePassword = (e) => {
+        let value = e.target.value;
         this.setState({
-            code_button_loading: false,
-            code_button_disabled: true,
-            code_button_text: `${sec}S`
+            password: value//获取输入框的password
         })
-
-        timer = setInterval(() => {
-            sec--;
-            if (sec <= 0) {
-                this.setState({
-                    code_button_text: '重新获取',
-                    code_button_disabled: false,
-                })
-                clearInterval(timer);
-                return false;
-            }
-            this.setState({
-                code_button_text: `${sec}S`
-            })
-        }, 1000)
-        //setInterval \ clearInterval 不间断定时器
-        //setTimeout  \ clearTimeout  只执行一次
-
-
+    }
+    inputChangeCode = (e) => {
+        let value = e.target.value;
+        this.setState({
+            code: value//获取输入框的code
+        })
     }
     toggleForm = () => {
         this.props.switchForm("register");
     }
 
     render() {
-        const { username, code_button_loading, code_button_text, code_button_disabled } = this.state;
+        const { username, module, loading } = this.state;
         //const _this = this;
         return (
             <Fragment>
@@ -126,7 +110,7 @@ class LoginForm extends Component {
                                 //   })
                             ]
                         }>
-                            <Input value={username} onChange={this.inputChange} prefix={<UserOutlined className="site-form-item-icon" />} placeholder="email" />
+                            <Input value={username} onChange={this.inputChangeUsername} prefix={<UserOutlined className="site-form-item-icon" />} placeholder="email" />
                         </Form.Item>
                         <Form.Item name="password" rules={
                             [
@@ -143,7 +127,7 @@ class LoginForm extends Component {
                                 // })
                             ]
                         }>
-                            <Input prefix={<LockOutlined className="site-form-item-icon" />} placeholder="password" />
+                            <Input onChange={this.inputChangePassword} type="password" prefix={<LockOutlined className="site-form-item-icon" />} placeholder="password" />
                         </Form.Item>
                         <Form.Item name="verification" rules={
                             [
@@ -153,15 +137,15 @@ class LoginForm extends Component {
                         }>
                             <Row gutter={13}>
                                 <Col span={15}>
-                                    <Input prefix={<MailOutlined className="site-form-item-icon" />} placeholder="Code" />
+                                    <Input onChange={this.inputChangeCode} prefix={<MailOutlined className="site-form-item-icon" />} placeholder="Code" />
                                 </Col>
                                 <Col span={9}>
-                                    <Button type="primary" danger block disabled={code_button_disabled} loading={code_button_loading} onClick={this.getCode} > {code_button_text} </Button>
+                                    <Code username={username} module={module}></Code>
                                 </Col>
                             </Row>
                         </Form.Item>
                         <Form.Item>
-                            <Button type="primary" htmlType="submit" className="login-form-button" block> 登录 </Button>
+                            <Button type="primary" loading={loading} htmlType="submit" className="login-form-button" block> 登录 </Button>
                         </Form.Item>
                     </Form>
                 </div>
@@ -170,4 +154,4 @@ class LoginForm extends Component {
     }
 }
 
-export default LoginForm;
+export default withRouter(LoginForm);
