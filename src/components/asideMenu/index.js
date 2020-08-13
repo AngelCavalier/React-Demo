@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from "react";
-import { Link } from "react-router-dom"
+import { Link, withRouter } from "react-router-dom"
 //icon
 import { UserOutlined } from '@ant-design/icons';
 //antd
@@ -11,20 +11,48 @@ const { SubMenu } = Menu;
 class AsideMenu extends Component {
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {
+            selectedKeys: [],
+            openKeys: []
+        };
     }
 
-    //一级菜单
-    //<Menu.Item key="0">控制台</Menu.Item>
+    // 生命周期，在这里多了一层接口请求，并过滤路由
+    componentDidMount() {
+        const pathname = this.props.location.pathname;
+        const menuKey = pathname.split("/").slice(0, 3).join('/');
 
-    //子集菜单
-    // <SubMenu key="sub1" icon={<UserOutlined />} title="subnav 1">
-    //     <Menu.Item key="1">option1</Menu.Item>
-    //     <Menu.Item key="2">option2</Menu.Item>
-    //     <Menu.Item key="3">option3</Menu.Item>
-    //     <Menu.Item key="4">option4</Menu.Item>
-    // </SubMenu>
+        console.log(pathname.split("/"))//拆分字符串为数组
+        console.log(pathname.split("/").slice(0, 3))//截取数组
+        console.log(pathname.split("/").slice(0, 3).join("/"))//讲数组重新转为字符串
+        const menuHigh = {
+            selectedKeys: pathname,
+            openKeys: menuKey
+        }
+        this.selectMenuHigh(menuHigh);
+    }
+    //选择菜单
+    selectMenu = ({ item, key, keyPath, domEvent }) => {
+        const menuHigh = {
+            selectedKeys: key,
+            openKeys: keyPath[keyPath.length - 1]//数组的长度-1，即是数组的最后一项
+        }
+        this.selectMenuHigh(menuHigh);
 
+    }
+    //打开菜单
+    openMenu = (openKeys) => {
+        this.setState({
+            openKeys: [openKeys[openKeys.length - 1]]
+        })
+    }
+    //菜单高光
+    selectMenuHigh = ({ selectedKeys, openKeys }) => {
+        this.setState({
+            selectedKeys: [selectedKeys],
+            openKeys: [openKeys]
+        })
+    }
     //无子集菜单处理
     renderMenu = ({ title, key }) => {
         return (
@@ -47,14 +75,16 @@ class AsideMenu extends Component {
     }
 
     render() {
+        const { selectedKeys, openKeys } = this.state;
         return (
             <Fragment>
-
                 <Menu
+                    onOpenChange={this.openMenu}
+                    onClick={this.selectMenu}
                     theme="dark"
                     mode="inline"
-                    defaultSelectedKeys={['1']}
-                    defaultOpenKeys={['sub1']}
+                    selectedKeys={selectedKeys}
+                    openKeys={openKeys}
                     style={{ height: '100%', borderRight: 0 }}
                 >
                     {
@@ -69,4 +99,5 @@ class AsideMenu extends Component {
     }
 }
 
-export default AsideMenu;
+export default withRouter(AsideMenu);
+
