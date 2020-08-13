@@ -26,7 +26,8 @@ class LayoutHeader extends Component {
             <div className={collapsed ? "collapsed-close" : ""}>
                 <h1 className="logo"><span>LOGO</span></h1>
                 <div className="header-wrap">
-                    <span className="collapsed-icon" onClick={this.toggleMenu}>< MenuFoldOutlined /></span>
+                    <span className="collapsed-icon" onClick={this.toggleMenu}>{collapsed ? <MenuUnfoldOutlined /> : < MenuFoldOutlined />}
+                    </span>
                 </div>
             </div>
         );
