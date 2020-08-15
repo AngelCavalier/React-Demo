@@ -22,9 +22,9 @@ class AsideMenu extends Component {
         const pathname = this.props.location.pathname;
         const menuKey = pathname.split("/").slice(0, 3).join('/');
 
-        console.log(pathname.split("/"))//拆分字符串为数组
-        console.log(pathname.split("/").slice(0, 3))//截取数组
-        console.log(pathname.split("/").slice(0, 3).join("/"))//讲数组重新转为字符串
+        // console.log(pathname.split("/"))//拆分字符串为数组
+        // console.log(pathname.split("/").slice(0, 3))//截取数组
+        // console.log(pathname.split("/").slice(0, 3).join("/"))//讲数组重新转为字符串
         const menuHigh = {
             selectedKeys: pathname,
             openKeys: menuKey

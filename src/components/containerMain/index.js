@@ -1,10 +1,10 @@
 import React from "react";
 import { Switch } from "react-router-dom";
-//组件
-import UserList from "../../views/user/list"
-import UserAdd from "../../views/user/add"
 //私有路由组件
 import PrivateRouter from "../privateRouter/index"
+/**自动化工程**/
+import Components from "./components";
+
 class ContainerMain extends React.Component {
     constructor(props) {
         super(props);
@@ -14,8 +14,11 @@ class ContainerMain extends React.Component {
         return (
 
             <Switch>
-                <PrivateRouter exact path="/index/user/list" component={UserList} />
-                <PrivateRouter exact path="/index/user/add" component={UserAdd} />
+                {
+                    Components.map(item => {
+                        return <PrivateRouter exact key={item.path} path={item.path} component={item.component} />
+                    })
+                }
             </Switch>
 
         );
