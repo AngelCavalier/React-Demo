@@ -2,7 +2,7 @@ import React from "react";
 
 import { Route, Redirect } from "react-router-dom";
 //方法
-import { getToken } from "../../utils/sessions"
+import { getToken } from "../../utils/cookies"
 
 const PrivateRouter = ({ component: Component, ...rest }) => {
     return (

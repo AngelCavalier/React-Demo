@@ -12,7 +12,7 @@ import Code from "../../components/code/index"
 //密码加密
 import CryptoJS from 'crypto-js'
 // 方法
-import { setToken } from "../../utils/sessions";
+import { setToken, setUsername } from "../../utils/cookies";
 
 
 
@@ -44,6 +44,7 @@ class LoginForm extends Component {
             const data = response.data.data
             //存储token
             setToken(data.token);
+            setUsername(data.username);
             //路由跳转
             this.props.history.push('/index')
         }).catch(error => {
