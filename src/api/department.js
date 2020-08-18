@@ -32,3 +32,36 @@ export function Delete(data) {
         data: data,//请求类型为post时
     })
 }
+
+/**
+ * 禁启用
+ */
+export function Status(data) {
+    return service.request({
+        url: "/department/status/",
+        method: "post",
+        data: data,//请求类型为post时
+    })
+}
+
+/**
+ * 详情
+ */
+export function Detailed(data) {
+    return service.request({
+        url: "/department/detailed/",
+        method: "post",
+        data: data,//请求类型为post时
+    })
+}
+
+/**
+ * 编辑
+ */
+export function Edit(data) {
+    return service.request({
+        url: "/department/edit/",
+        method: "post",
+        data: data,//请求类型为post时
+    })
+}

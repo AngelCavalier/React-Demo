@@ -2,18 +2,37 @@ import React from "react";
 //antd
 import { Form, Input, Button, InputNumber, Radio, message } from "antd"
 //API
-import { DepartmentAddApi } from "@api/department"
+import { DepartmentAddApi, Detailed, Edit } from "@api/department"
 
 class DepartmentAdd extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             loading: false,
+            id: "",
             formLayout: {
                 labelCol: { span: 2 },
                 wrapperCol: { span: 20 }
             }
         };
+    }
+    componentWillMount() {
+        if (this.props.location.state) {
+            this.setState({
+                id: this.props.location.state.id
+            })
+        }
+    }
+    componentDidMount() {
+        this.getDerailed();
+    }
+    getDerailed = () => {
+        if (!this.props.location.state) { return false; }
+        Detailed({ id: this.state.id }).then(response => {
+            this.refs.form.setFieldsValue(
+                response.data.data
+            )
+        })
     }
     onSubmit = (value) => {
         if (!value.name) {
@@ -31,6 +50,11 @@ class DepartmentAdd extends React.Component {
         this.setState({
             loading: true
         })
+        // 确定按钮执行添加或编辑
+        this.state.id ? this.onHandelEdit(value) : this.onHandelAdd(value);
+    }
+    //添加信息
+    onHandelAdd = (value) => {
         DepartmentAddApi(value).then(response => {
             const data = response.data;
             message.info(data.message)
@@ -39,6 +63,22 @@ class DepartmentAdd extends React.Component {
             })
             //重置表单
             this.refs.form.resetFields();
+        }).catch(error => {
+            this.setState({
+                loading: false
+            })
+        })
+    }
+    //编辑信息
+    onHandelEdit = (value) => {
+        const requestData = value;
+        requestData.id = this.state.id;
+        Edit(requestData).then(response => {
+            const data = response.data;
+            message.info(data.message)
+            this.setState({
+                loading: false
+            })
         }).catch(error => {
             this.setState({
                 loading: false

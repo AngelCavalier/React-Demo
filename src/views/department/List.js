@@ -1,8 +1,10 @@
 import React, { Component, Fragment } from "react";
+//
+import { Link } from "react-router-dom";
 //antd
-import { Form, Input, Button, Table, Switch, message } from "antd";
+import { Form, Input, Button, Table, Switch, message, Modal } from "antd";
 //api
-import { GetList, Delete } from "@api/department"
+import { GetList, Delete, Status } from "@api/department"
 
 class DepartmentList extends Component {
     constructor(props) {
@@ -13,7 +15,15 @@ class DepartmentList extends Component {
             pageSize: 10,
             keyWord: "",
             //复选框数据
-            selectRowKeys: [],
+            selectedRowKeys: [],
+            //警告弹窗
+            visible: false,
+            //弹窗确定按钮 loading
+            confirmLoading: false,
+            //id
+            id: "",
+            //表格加载
+            loadingTable: false,
             //表头
             columns: [
                 { title: '部门名称', dataIndex: 'name', key: 'name' },
@@ -22,7 +32,7 @@ class DepartmentList extends Component {
                     dataIndex: 'status',
                     key: 'status',
                     render: (text, rowData) => {
-                        return <Switch checkedChildren="启用" unCheckedChildren="禁用" defaultChecked={rowData.status === "1" ? true : false} />
+                        return <Switch onChange={() => this.onHandelSwitch(rowData)} checkedChildren="启用" unCheckedChildren="禁用" defaultChecked={rowData.status === "1" ? true : false} />
                     }
                 },
                 { title: '人员数量', dataIndex: 'number', key: 'number' },
@@ -34,7 +44,9 @@ class DepartmentList extends Component {
                     render: (text, rowData) => {
                         return (
                             <div className="inline-button">
-                                <Button type="primary">编辑</Button>
+                                <Button type="primary">
+                                    <Link to={{ pathname: '/index/department/add', state: { id: rowData.id } }}>编辑</Link>
+                                </Button>
                                 <Button onClick={() => this.onHandelDelete(rowData.id)}>删除</Button>
                             </div>
                         )
@@ -59,6 +71,7 @@ class DepartmentList extends Component {
         if (keyWord) {
             requestData.name = keyWord
         }
+        this.setState({ loadingTable: true })
         GetList(requestData).then(response => {
             const responseData = response.data.data//数组
             // console.log(response)
@@ -67,6 +80,9 @@ class DepartmentList extends Component {
                     dataSource: responseData.data
                 })
             }
+            this.setState({ loadingTable: false })
+        }).catch(error => {
+            this.setState({ loadingTable: false })
         })
     }
     //搜索
@@ -80,20 +96,56 @@ class DepartmentList extends Component {
         this.loadData();
     }
     //删除
-    onHandelDelete = (id) => {
-        if (!id) { return false; }
-        Delete({ id: id }).then(response => {
+    onHandelDelete(id) {
+        if (!id) {//批量删除
+            if (this.state.selectedRowKeys.length === 0) { return false; }
+            id = this.state.selectedRowKeys.join();
+        }
+        this.setState({
+            visible: true,
+            id
+        })
+
+    }
+    //禁启用
+    onHandelSwitch(data) {
+        if (!data.status) { return false; }
+        const requestData = {
+            id: data.id,
+            status: data.status === "1" ? false : true
+        }
+        this.setState({ id: data.id })
+        Status(requestData).then(response => {
             message.info(response.data.message)
-            //请求接口，更新数据
-            this.loadData();
+            this.setState({ id: "" })
+        }).catch(error => {
+            this.setState({ id: "" })
         })
     }
     //复选框
-    onCheckbox = (selectRowKeys) => {
-        this.setState({ selectRowKeys: selectRowKeys })
+    onCheckbox = (selectedRowKeys) => {
+        this.setState({ selectedRowKeys: selectedRowKeys })
+    }
+    //弹窗
+    modalThen = () => {
+        this.setState({
+            confirmLoading: true
+        })
+        Delete({ id: this.state.id }).then(response => {
+            message.info(response.data.message)
+            this.setState({
+                visible: false,
+                id: "",
+                confirmLoading: false,
+                selectedRowKeys: []
+            })
+            //请求接口，更新数据
+            this.loadData();
+        })
+
     }
     render() {
-        const { columns, dataSource } = this.state;
+        const { columns, dataSource, loadingTable } = this.state;
         const rowSelection = {
             onChange: this.onCheckbox
         }
@@ -108,8 +160,20 @@ class DepartmentList extends Component {
                     </Form.Item>
                 </Form>
                 <div className="table-wrap">
-                    <Table rowSelection rowKey="id" dataSource={dataSource} columns={columns} bordered></Table>
+                    <Table loading={loadingTable} rowSelection={rowSelection} rowKey="id" dataSource={dataSource} columns={columns} bordered></Table>
+                    <Button onClick={() => this.onHandelDelete()}>批量删除</Button>
                 </div>
+                <Modal
+                    title="提示"
+                    visible={this.state.visible}
+                    onOk={this.modalThen}
+                    onCancel={() => { this.setState({ visible: false }) }}
+                    okText="确认"
+                    cancelText="取消"
+                    confirmLoading={this.state.confirmLoading}
+                >
+                    <p className="text-center">确定删除此信息？<strong className="color-red">删除后将无法恢复。</strong></p>
+                </Modal>
             </Fragment>
 
         );
