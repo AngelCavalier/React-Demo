@@ -88,7 +88,7 @@ class DepartmentList extends Component {
     //搜索
     onFinish = (value) => {
         this.setState({
-            keyWord: value.name,
+            keyWord: value.username,
             pageNumber: 1,
             pageSize: 10,
         })
